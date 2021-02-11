@@ -1,7 +1,7 @@
 package com.example.demo.controllers;
 
 import com.example.demo.model.persistence.Cart;
-import com.example.demo.model.persistence.User;
+import com.example.demo.model.persistence.Customer;
 import com.example.demo.model.persistence.repositories.CartRepository;
 import com.example.demo.model.persistence.repositories.UserRepository;
 import com.example.demo.model.requests.CreateUserRequest;
@@ -26,29 +26,29 @@ public class UserController {
 	private @Autowired BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@GetMapping("/id/{id}")
-	public ResponseEntity<User> findById(@PathVariable Long id) {
+	public ResponseEntity<Customer> findById(@PathVariable Long id) {
 		return ResponseEntity.of(userRepository.findById(id));
 	}
 	
 	@GetMapping("/{username}")
-	public ResponseEntity<User> findByUsername(@PathVariable String username) {
-		User user = userRepository.findByUsername(username);
-		return user == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(user);
+	public ResponseEntity<Customer> findByUsername(@PathVariable String username) {
+		Customer customer = userRepository.findByUsername(username);
+		return customer == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(customer);
 	}
 	
 	@PostMapping("/create")
-	public ResponseEntity<User> createUser(@RequestBody CreateUserRequest createUserRequest) {
+	public ResponseEntity<Customer> createUser(@RequestBody CreateUserRequest createUserRequest) {
 
 		if(createUserRequest.getPassword().length() < 7 ||
 				!createUserRequest.getPassword().equals(createUserRequest.getConfirmPassword())){
-			log.info("createUser, password doesn't match password pattern");
+			log.info("  ===== createUser, password doesn't match password pattern");
 			return ResponseEntity.badRequest().build();
 		}
 
 		// Creating an empty cart
 		Cart cart = new Cart();
 		cartRepository.save(cart);
-		log.info("Cart created successfully for " + createUserRequest.getUsername());
+		log.info("  ===== Cart created successfully for " + createUserRequest.getUsername());
 
 		// salting, hashing password
 		SecureRandom random = new SecureRandom();
@@ -58,15 +58,15 @@ public class UserController {
 		String password = HashUtil.getHashedValue(createUserRequest.getPassword(), encodedSalt);
 
 		// Set user attributes
-		User user = new User();
-		user.setUsername(createUserRequest.getUsername()); // username
-		user.setCart(cart); // cart
-		user.setPassword(password); // password
-		user.setSalt(encodedSalt); // salt
-		user.setPassword(bCryptPasswordEncoder.encode(createUserRequest.getPassword()));
-		userRepository.save(user);
-		log.info("User successfully created " + createUserRequest.getUsername());
-		return ResponseEntity.ok(user);
+		Customer customer = new Customer();
+		customer.setUsername(createUserRequest.getUsername()); // username
+		customer.setCart(cart); // cart
+		customer.setPassword(password); // password
+		customer.setSalt(encodedSalt); // salt
+		customer.setPassword(bCryptPasswordEncoder.encode(createUserRequest.getPassword()));
+		userRepository.save(customer);
+		log.info("  ===== User successfully created " + createUserRequest.getUsername());
+		return ResponseEntity.ok(customer);
 	}
 	
 }

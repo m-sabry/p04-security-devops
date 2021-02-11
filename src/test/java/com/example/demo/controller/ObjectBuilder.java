@@ -1,8 +1,8 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.persistence.Cart;
+import com.example.demo.model.persistence.Customer;
 import com.example.demo.model.persistence.Item;
-import com.example.demo.model.persistence.User;
 import com.example.demo.model.requests.CreateUserRequest;
 import com.example.demo.model.requests.ModifyCartRequest;
 
@@ -16,13 +16,13 @@ public class ObjectBuilder {
     public static final String PASSWORD = "password";
 
     // User
-    public static User buildUser() {
-        User user = new User();
-        user.setId(1L);
-        user.setUsername(USERNAME);
-        user.setPassword(PASSWORD);
-        user.setCart(new Cart());
-        return user;
+    public static Customer buildUser() {
+        Customer customer = new Customer();
+        customer.setId(1L);
+        customer.setUsername(USERNAME);
+        customer.setPassword(PASSWORD);
+        customer.setCart(new Cart());
+        return customer;
     }
     public static CreateUserRequest buildUserRequest(String username, String password){
         CreateUserRequest request = new CreateUserRequest();
@@ -53,11 +53,11 @@ public class ObjectBuilder {
     }
 
     // Cart
-    public static Cart buildCart(User user, List<Item> items) {
+    public static Cart buildCart(Customer customer, List<Item> items) {
         Cart myCart = new Cart();
         myCart.setId(1L);
         myCart.setItems(items);
-        myCart.setUser(user);
+        myCart.setCustomer(customer);
         return myCart;
     }
     public static ModifyCartRequest buildCartRequest(Long itemId, int quantity, String username) {

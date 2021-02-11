@@ -8,6 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,9 +25,10 @@ import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
  * It overrides on method, and defines another custom method.
  */
 @Component
-public class JWTAuthenticationVerficationFilter extends BasicAuthenticationFilter {
+@Slf4j
+public class JWTAuthenticationVerificationFilter extends BasicAuthenticationFilter {
 	
-	public JWTAuthenticationVerficationFilter(AuthenticationManager authManager) {
+	public JWTAuthenticationVerificationFilter(AuthenticationManager authManager) {
         super(authManager);
     }
 
@@ -44,6 +46,10 @@ public class JWTAuthenticationVerficationFilter extends BasicAuthenticationFilte
         String header = req.getHeader(SecurityConstants.HEADER_STRING);
 
         if (header == null || !header.startsWith(SecurityConstants.TOKEN_PREFIX)) {
+            if(header != null && !header.startsWith(SecurityConstants.TOKEN_PREFIX))
+                log.info("  ===== Missing security token...");
+            else
+                log.info("  ===== Missing header... ");
             chain.doFilter(req, res);
             return;
         }
@@ -60,16 +66,30 @@ public class JWTAuthenticationVerficationFilter extends BasicAuthenticationFilte
      * @return
      */
 	private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest req) {
+	    log.info("  ===== Request: " + req.toString());
 		String token = req.getHeader(SecurityConstants.HEADER_STRING);
+        log.info("  ===== token: " + token);
         if (token != null) {
             String user = JWT.require(HMAC512(SecurityConstants.SECRET.getBytes())).build()
                     .verify(token.replace(SecurityConstants.TOKEN_PREFIX, ""))
                     .getSubject();
             if (user != null) {
-                return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+                log.info("  ===== Going to authenticate user: " + user);
+                UsernamePasswordAuthenticationToken upat = new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+
+                if(upat != null) {
+                    log.info("  ===== User authenticated!");
+                    return upat;
+                }
+                else {
+                    log.info("  ===== User not authenticated!");
+                    return null;
+                }
             }
+            log.info("  ===== User not authenticated!");
             return null;
         }
+        log.info("  ===== Missing token!");
         return null;
 	}
 

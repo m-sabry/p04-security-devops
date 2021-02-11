@@ -3,8 +3,8 @@ package com.example.demo.controller;
 import com.example.demo.TestUtils;
 import com.example.demo.controllers.CartController;
 import com.example.demo.model.persistence.Cart;
+import com.example.demo.model.persistence.Customer;
 import com.example.demo.model.persistence.Item;
-import com.example.demo.model.persistence.User;
 import com.example.demo.model.persistence.repositories.CartRepository;
 import com.example.demo.model.persistence.repositories.ItemRepository;
 import com.example.demo.model.persistence.repositories.UserRepository;
@@ -40,13 +40,13 @@ public class CartControllerTest {
     public void successfulAddToCart()throws Exception {
         // _TODO
 
-        User user = ObjectBuilder.buildUser();
+        Customer customer = ObjectBuilder.buildUser();
         List<Item> items = ObjectBuilder.buildItemsList();
         Item item0 = items.get(0);
-        Cart cart = ObjectBuilder.buildCart(user, items);
-        ModifyCartRequest cartReq = ObjectBuilder.buildCartRequest(item0.getId(), 10, user.getUsername());
+        Cart cart = ObjectBuilder.buildCart(customer, items);
+        ModifyCartRequest cartReq = ObjectBuilder.buildCartRequest(item0.getId(), 10, customer.getUsername());
 
-        when (userRepository.findByUsername(cartReq.getUsername())).thenReturn(user);
+        when (userRepository.findByUsername(cartReq.getUsername())).thenReturn(customer);
         when(itemRepository.findById(cartReq.getItemId())).thenReturn(Optional.of(item0));
 
         final ResponseEntity<Cart> cartRespEntity = cartController.addToCart(cartReq);
@@ -62,15 +62,15 @@ public class CartControllerTest {
     @Test
     public void successfulRemoveFromCart(){
         // _TODO implement
-        User user = ObjectBuilder.buildUser(); // user
+        Customer customer = ObjectBuilder.buildUser(); // user
         List<Item> items = ObjectBuilder.buildItemsList(); // list of items with one item only
         Item item0 = items.get(0);
-        ModifyCartRequest cartReq = ObjectBuilder.buildCartRequest(items.get(0).getId(), 1, user.getUsername());
-        Cart cart = ObjectBuilder.buildCart(user, items); // creating cart with two items
+        ModifyCartRequest cartReq = ObjectBuilder.buildCartRequest(items.get(0).getId(), 1, customer.getUsername());
+        Cart cart = ObjectBuilder.buildCart(customer, items); // creating cart with two items
 
-        when (userRepository.findByUsername(cartReq.getUsername())).thenReturn(user);
+        when (userRepository.findByUsername(cartReq.getUsername())).thenReturn(customer);
         when(itemRepository.findById(cartReq.getItemId())).thenReturn(Optional.of(item0));
-        when(cartRepository.findById(user.getCart().getId())).thenReturn(Optional.of(cart));
+        when(cartRepository.findById(customer.getCart().getId())).thenReturn(Optional.of(cart));
 
         // Adding item to cart
         ResponseEntity<Cart> cartResponse = cartController.addToCart(cartReq);
@@ -80,11 +80,11 @@ public class CartControllerTest {
 
         // Removing an item from the cart
         items.remove(0);
-        Cart modifiedCart = ObjectBuilder.buildCart(user, items);
-        ModifyCartRequest toBeRemoved = ObjectBuilder.buildCartRequest(item0.getId(), 1, user.getUsername());
+        Cart modifiedCart = ObjectBuilder.buildCart(customer, items);
+        ModifyCartRequest toBeRemoved = ObjectBuilder.buildCartRequest(item0.getId(), 1, customer.getUsername());
         ResponseEntity<Cart> cartResponseAfterRemove = cartController.removeFromCart(toBeRemoved);
 
-        when(cartRepository.findById(user.getCart().getId())).thenReturn(Optional.of(modifiedCart));
+        when(cartRepository.findById(customer.getCart().getId())).thenReturn(Optional.of(modifiedCart));
 
         assertEquals(200, cartResponseAfterRemove.getStatusCodeValue());
         assertNotNull(cartResponseAfterRemove);

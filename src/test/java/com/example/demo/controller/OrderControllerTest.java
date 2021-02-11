@@ -3,8 +3,8 @@ package com.example.demo.controller;
 import com.example.demo.TestUtils;
 import com.example.demo.controllers.OrderController;
 import com.example.demo.model.persistence.Cart;
+import com.example.demo.model.persistence.Customer;
 import com.example.demo.model.persistence.Item;
-import com.example.demo.model.persistence.User;
 import com.example.demo.model.persistence.UserOrder;
 import com.example.demo.model.persistence.repositories.OrderRepository;
 import com.example.demo.model.persistence.repositories.UserRepository;
@@ -12,7 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,14 +38,14 @@ public class OrderControllerTest {
         ArrayList<Item> itemList = new ArrayList<>();
         itemList.add(item1);
 
-        User user = ObjectBuilder.buildUser();
+        Customer customer = ObjectBuilder.buildUser();
 
-        Cart cart1 = ObjectBuilder.buildCart(user, itemList);
-        cart1.setUser(user);
+        Cart cart1 = ObjectBuilder.buildCart(customer, itemList);
+        cart1.setCustomer(customer);
         cart1.setItems(itemList);
-        user.setCart(cart1);
+        customer.setCart(cart1);
 
-        when(userRepository.findByUsername(ObjectBuilder.USERNAME)).thenReturn(user);
+        when(userRepository.findByUsername(ObjectBuilder.USERNAME)).thenReturn(customer);
         ResponseEntity<UserOrder> submitOrder = orderController.submit(ObjectBuilder.USERNAME);
         assertNotNull(submitOrder);
         assertEquals(200, submitOrder.getStatusCodeValue());
@@ -63,14 +62,14 @@ public class OrderControllerTest {
         ArrayList<Item> itemList = new ArrayList<>();
         itemList.add(item1);
 
-        User user = ObjectBuilder.buildUser();
+        Customer customer = ObjectBuilder.buildUser();
 
-        Cart cart1 = ObjectBuilder.buildCart(user, itemList);
-        cart1.setUser(user);
+        Cart cart1 = ObjectBuilder.buildCart(customer, itemList);
+        cart1.setCustomer(customer);
         cart1.setItems(itemList);
-        user.setCart(cart1);
+        customer.setCart(cart1);
 
-        when(userRepository.findByUsername("orderHistSuccess")).thenReturn(user);
+        when(userRepository.findByUsername("orderHistSuccess")).thenReturn(customer);
 
         final ResponseEntity<List<UserOrder>> userOrderHistory =
                 orderController.getOrdersForUser("orderHistSuccess");
