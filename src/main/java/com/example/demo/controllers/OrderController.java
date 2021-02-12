@@ -30,12 +30,13 @@ public class OrderController {
 	public ResponseEntity<UserOrder> submit(@PathVariable String username) {
 		Customer customer = userRepository.findByUsername(username);
 		if(customer == null) {
-			log.info("  ===== Order creation, user with name: " + username + " doesn't exist");
+			log.info(" ** CUSTOMER_DOES_NOT_EXIST, user with name: " + username + " doesn't exist");
+			log.info(" ** ORDER_CREATION_FAILURE");
 			return ResponseEntity.notFound().build();
 		}
 		UserOrder order = UserOrder.createFromCart(customer.getCart());
 		orderRepository.save(order);
-		log.info("  ===== Order Creation, order successfully created for user with name: " + username);
+		log.info(" ** ORDER_SUCCESSFULLY_CREATED, order successfully created for user with name: " + username);
 		return ResponseEntity.ok(order);
 	}
 	
@@ -43,9 +44,11 @@ public class OrderController {
 	public ResponseEntity<List<UserOrder>> getOrdersForUser(@PathVariable String username) {
 		Customer customer = userRepository.findByUsername(username);
 		if(customer == null) {
-			log.info("  ===== getOrdersForUser, user with name: " + username + " doesn't exist");
+			log.info(" ** CUSTOMER_DOES_NOT_EXIST, user with name: " + username + " doesn't exist");
+			log.info(" ** ORDERS_RETRIEVE_FAILURE");
 			return ResponseEntity.notFound().build();
 		}
+		log.info(" ** ORDERS_RETRIEVED_SUCCESSFULLY, user with name: " + username + " doesn't exist");
 		return ResponseEntity.ok(orderRepository.findByCustomer(customer));
 	}
 }

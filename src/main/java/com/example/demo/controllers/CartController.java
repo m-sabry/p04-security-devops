@@ -33,19 +33,19 @@ public class CartController {
 	public ResponseEntity<Cart> addToCart(@RequestBody ModifyCartRequest request) {
 		Customer customer = userRepository.findByUsername(request.getUsername());
 		if(customer == null) {
-			log.info("  =====  AddToCart, user with name: " + request.getUsername() + " doesn't exist");
+			log.info(" ** CUSTOMER_DOES_NOT_EXIST, user with name: " + request.getUsername() + " doesn't exist");
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 		Optional<Item> item = itemRepository.findById(request.getItemId());
 		if(!item.isPresent()) {
-			log.info("  =====  AddToCart, item with id: " + request.getItemId() + " doesn't exist");
+			log.info(" ** ITEM_DOES_NOT_EXIST, item with id: " + request.getItemId() + " doesn't exist");
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 		Cart cart = customer.getCart();
 		IntStream.range(0, request.getQuantity())
 			.forEach(i -> cart.addItem(item.get()));
 		cartRepository.save(cart);
-		log.info("  =====  AddToCart, item with id: " + request.getItemId() + " Added to "+ customer.getUsername() +"'s cart");
+		log.info(" ** ITEM_ADDED_TO_CART, CART_SAVED, item with id: " + request.getItemId() + " Added to "+ customer.getUsername() +"'s cart");
 		return ResponseEntity.ok(cart);
 	}
 	
@@ -53,19 +53,19 @@ public class CartController {
 	public ResponseEntity<Cart> removeFromCart(@RequestBody ModifyCartRequest request) {
 		Customer customer = userRepository.findByUsername(request.getUsername());
 		if(customer == null) {
-			log.info("  =====  RemoveFromCart, user with name: " + request.getUsername() + " doesn't exist");
+			log.info(" ** CUSTOMER_DOES_NOT_EXIST, user with name: " + request.getUsername() + " doesn't exist");
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 		Optional<Item> item = itemRepository.findById(request.getItemId());
 		if(!item.isPresent()) {
-			log.info("  =====  RemoveFromCart, item with id: " + request.getItemId() + " doesn't exist");
+			log.info(" ** ITEM_DOES_NOT_EXIST, item with id: " + request.getItemId() + " doesn't exist");
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 		Cart cart = customer.getCart();
 		IntStream.range(0, request.getQuantity())
 			.forEach(i -> cart.removeItem(item.get()));
 		cartRepository.save(cart);
-		log.info("  =====  RemoveFromCart, item with id: " + request.getItemId() + " successfully removed from "+ customer.getUsername() +"'s cart");
+		log.info(" ** ITEM_REMOVED_FROM_CART, CART_SAVED, item with id: " + request.getItemId() + " successfully removed from "+ customer.getUsername() +"'s cart");
 		return ResponseEntity.ok(cart);
 	}
 		

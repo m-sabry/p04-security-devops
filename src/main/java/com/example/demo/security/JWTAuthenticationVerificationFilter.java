@@ -46,10 +46,7 @@ public class JWTAuthenticationVerificationFilter extends BasicAuthenticationFilt
         String header = req.getHeader(SecurityConstants.HEADER_STRING);
 
         if (header == null || !header.startsWith(SecurityConstants.TOKEN_PREFIX)) {
-            if(header != null && !header.startsWith(SecurityConstants.TOKEN_PREFIX))
-                log.info("  ===== Missing security token...");
-            else
-                log.info("  ===== Missing header... ");
+            log.info(" ** AUTHENTICATION_FAILURE, NO_TOKEN");
             chain.doFilter(req, res);
             return;
         }
@@ -66,31 +63,17 @@ public class JWTAuthenticationVerificationFilter extends BasicAuthenticationFilt
      * @return
      */
 	private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest req) {
-	    log.info("  ===== Request: " + req.toString());
-		String token = req.getHeader(SecurityConstants.HEADER_STRING);
-        log.info("  ===== token: " + token);
+        String token = req.getHeader(SecurityConstants.HEADER_STRING);
         if (token != null) {
             String user = JWT.require(HMAC512(SecurityConstants.SECRET.getBytes())).build()
                     .verify(token.replace(SecurityConstants.TOKEN_PREFIX, ""))
                     .getSubject();
             if (user != null) {
-                log.info("  ===== Going to authenticate user: " + user);
-                UsernamePasswordAuthenticationToken upat = new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
-
-                if(upat != null) {
-                    log.info("  ===== User authenticated!");
-                    return upat;
-                }
-                else {
-                    log.info("  ===== User not authenticated!");
-                    return null;
-                }
+                return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
             }
-            log.info("  ===== User not authenticated!");
             return null;
         }
-        log.info("  ===== Missing token!");
         return null;
-	}
+    }
 
 }

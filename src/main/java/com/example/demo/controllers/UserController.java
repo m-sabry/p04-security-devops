@@ -41,14 +41,13 @@ public class UserController {
 
 		if(createUserRequest.getPassword().length() < 7 ||
 				!createUserRequest.getPassword().equals(createUserRequest.getConfirmPassword())){
-			log.info("  ===== createUser, password doesn't match password pattern");
+			log.info(" ** USER_NOT_CREATED, password doesn't match password pattern");
 			return ResponseEntity.badRequest().build();
 		}
 
 		// Creating an empty cart
 		Cart cart = new Cart();
 		cartRepository.save(cart);
-		log.info("  ===== Cart created successfully for " + createUserRequest.getUsername());
 
 		// salting, hashing password
 		SecureRandom random = new SecureRandom();
@@ -65,7 +64,7 @@ public class UserController {
 		customer.setSalt(encodedSalt); // salt
 		customer.setPassword(bCryptPasswordEncoder.encode(createUserRequest.getPassword()));
 		userRepository.save(customer);
-		log.info("  ===== User successfully created " + createUserRequest.getUsername());
+		log.info(" ** USER_CREATED, user name: " + createUserRequest.getUsername());
 		return ResponseEntity.ok(customer);
 	}
 	
