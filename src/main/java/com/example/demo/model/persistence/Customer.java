@@ -30,5 +30,6 @@ public class Customer {
 	@JsonIgnore
     private Cart cart;
 
+	@JsonIgnore
 	private String salt;
 }
